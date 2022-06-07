@@ -5,19 +5,17 @@ import com.najjar.students.repositories.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class StudentServices {
+public class StudentService {
     private final StudentRepository studentRepository;
 
     @Autowired
-    public StudentServices(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
 
@@ -50,12 +48,22 @@ public class StudentServices {
         if(name != null && name.length()!=0 && !Objects.equals(name, student.getName())){
             student.setName(name);
         }
-        if(email != null && email.length()!=0 && !Objects.equals(email, student.getEmail())){
+        if(email != null && email.length()  !=0 && !Objects.equals(email, student.getEmail())){
             Optional<Student> studentOptional = studentRepository.findStudentByEmail(student.getEmail());
             if(studentOptional.isPresent()){
                 throw new IllegalStateException("email taken");
             }
             student.setEmail(email);
         }
+    }
+
+
+
+    public Student getStudent(Long studentId ) {
+        Optional<Student> studentResponse =  studentRepository.findById(studentId);
+        if(studentResponse.isEmpty()){
+            throw new IllegalStateException("Student with id: "+studentId+" does not exists");
+        }
+        return studentResponse.get();
     }
 }
